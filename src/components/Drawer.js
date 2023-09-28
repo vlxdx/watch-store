@@ -1,52 +1,35 @@
-function Drawer() {
+function Drawer({ onClose, items = [] }) {
   return (
-    <div style={{ display: 'none' }} className="overlay">
+    <div className="overlay">
       <div className="drawer">
         <h2>
           Cart
           <img
+            onClick={onClose}
             style={{ cursor: 'pointer' }}
             src="/img/btn-remove.svg"
-            alt="Remove"
+            alt="Close"
           />
         </h2>
 
         <div className="items">
-          <div className="cartItem">
-            <div
-              style={{ backgroundImage: 'url(/img/watches/1.jpg)' }}
-              className="cartItemImg"
-            ></div>
-            <div className="watch">
-              <p>Casio G-Shock Classic</p>
-              <b>€119,00</b>
+          {items.map((obj) => (
+            <div className="cartItem">
+              <div
+                style={{ backgroundImage: `url(${obj.imageUrl})` }}
+                className="cartItemImg"
+              ></div>
+              <div className="watch">
+                <p>{obj.title}</p>
+                <b>{obj.price}</b>
+              </div>
+              <img
+                className="removeBtn"
+                src="/img/btn-remove.svg"
+                alt="Remove"
+              />
             </div>
-            <img className="removeBtn" src="/img/btn-remove.svg" alt="Remove" />
-          </div>
-
-          <div className="cartItem">
-            <div
-              style={{ backgroundImage: 'url(/img/watches/1.jpg)' }}
-              className="cartItemImg"
-            ></div>
-            <div className="watch">
-              <p>Casio G-Shock Classic</p>
-              <b>€119,00</b>
-            </div>
-            <img className="removeBtn" src="/img/btn-remove.svg" alt="Remove" />
-          </div>
-
-          <div className="cartItem">
-            <div
-              style={{ backgroundImage: 'url(/img/watches/1.jpg)' }}
-              className="cartItemImg"
-            ></div>
-            <div className="watch">
-              <p>Casio G-Shock Classic</p>
-              <b>€119,00</b>
-            </div>
-            <img className="removeBtn" src="/img/btn-remove.svg" alt="Remove" />
-          </div>
+          ))}
         </div>
 
         <div className="cartTotalBlock">

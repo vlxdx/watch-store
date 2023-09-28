@@ -1,35 +1,33 @@
+import React from 'react';
 import Card from './components/Card';
 import Drawer from './components/Drawer';
 import Header from './components/Header';
 
-const arr = [
-  {
-    title: 'Casio G-Shock Classic',
-    price: '€119,00',
-    imageUrl: '/img/watches/1.jpg',
-  },
-  {
-    title: 'Casio G-Shock Analog-Digital',
-    price: '€149,00',
-    imageUrl: '/img/watches/2.jpg',
-  },
-  {
-    title: 'Casio G-Shock Master of G',
-    price: '€379,00',
-    imageUrl: '/img/watches/3.jpg',
-  },
-  {
-    title: 'Casio G-Shock Limited',
-    price: '€189,00',
-    imageUrl: '/img/watches/4.jpg',
-  },
-];
-
 function App() {
+  const [items, setItems] = React.useState([]);
+  const [cartItems, setCartItems] = React.useState([]);
+  const [cartOpened, setCartOpened] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch('https://6512b96bb8c6ce52b3961711.mockapi.io/items')
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        setItems(json);
+      });
+  }, []);
+
+  const onAddToCart = (obj) => {
+    setCartItems((prev) => [...prev, obj]);
+  };
+
   return (
     <div className="wrapper">
-      <Drawer />
-      <Header />
+      {cartOpened && (
+        <Drawer items={cartItems} onClose={() => setCartOpened(false)} />
+      )}
+      <Header onClickCart={() => setCartOpened(true)} />
       <div className="content">
         <div className="watches">
           <h1>All Watches</h1>
@@ -39,13 +37,14 @@ function App() {
           </div>
         </div>
 
-        <div style={{ display: 'flex' }}>
-          {arr.map((obj) => (
+        <div style={{ display: 'flex', 'flex-wrap': 'wrap' }}>
+          {items.map((item) => (
             <Card
-              title={obj.title}
-              price={obj.price}
-              imageUrl={obj.imageUrl}
-              onClick={() => console.log(obj)}
+              title={item.title}
+              price={item.price}
+              imageUrl={item.imageUrl}
+              onFavourite={() => console.log('Added to Favourites')}
+              onPlus={(obj) => onAddToCart(obj)}
             />
           ))}
         </div>
