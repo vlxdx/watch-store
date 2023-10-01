@@ -1,8 +1,10 @@
 import React from 'react';
 import axios from 'axios';
-import Card from './components/Card';
 import Drawer from './components/Drawer';
 import Header from './components/Header';
+import { Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import Favourites from './pages/Favourites';
 
 function App() {
   const [items, setItems] = React.useState([]);
@@ -22,6 +24,11 @@ function App() {
       .then((res) => {
         setCartItems(res.data);
       });
+    axios
+      .get('https://65198207818c4e98ac6073b8.mockapi.io/favourites')
+      .then((res) => {
+        setFavourites(res.data);
+      });
   }, []);
 
   const onAddToCart = (obj) => {
@@ -35,9 +42,22 @@ function App() {
     setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const onAddToFavourite = (obj) => {
-    axios.post('https://65198207818c4e98ac6073b8.mockapi.io/favourites', obj);
-    setFavourites((prev) => [...prev, obj]);
+  const onAddToFavourite = async (obj) => {
+    try {
+      if (favourites.find((favObj) => favObj.id === obj.id)) {
+        axios.delete(
+          `https://65198207818c4e98ac6073b8.mockapi.io/favourites/${obj.id}`
+        );
+      } else {
+        const { data } = await axios.post(
+          'https://65198207818c4e98ac6073b8.mockapi.io/favourites',
+          obj
+        );
+        setFavourites((prev) => [...prev, data]);
+      }
+    } catch (error) {
+      alert('Failed to add to Favourites');
+    }
   };
 
   const onChangeSearchInput = (event) => {
@@ -54,46 +74,32 @@ function App() {
         />
       )}
       <Header onClickCart={() => setCartOpened(true)} />
-      <div className="content">
-        <div className="watches">
-          <h1>
-            {searchValue ? `Searching for: "${searchValue}"` : 'All Watches'}
-          </h1>
-          <div className="search-block">
-            <img src="/img/search.svg" alt="Search" />
-            {searchValue && (
-              <img
-                onClick={() => setSearchValue('')}
-                className="clear"
-                src="/img/btn-remove.svg"
-                alt="Clear"
-              />
-            )}
-            <input
-              onChange={onChangeSearchInput}
-              value={searchValue}
-              placeholder="Search..."
-            />
-          </div>
-        </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {items
-            .filter((item) =>
-              item.title.toLowerCase().includes(searchValue.toLowerCase())
-            )
-            .map((item, index) => (
-              <Card
-                key={index}
-                title={item.title}
-                price={item.price}
-                imageUrl={item.imageUrl}
-                onFavourite={(obj) => onAddToFavourite(obj)}
-                onPlus={(obj) => onAddToCart(obj)}
-              />
-            ))}
-        </div>
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Home
+              items={items}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+              onChangeSearchInput={onChangeSearchInput}
+              onAddToFavourite={onAddToFavourite}
+              onAddToCart={onAddToCart}
+            />
+          }
+        />
+
+        <Route
+          path="/favourites"
+          element={
+            <Favourites
+              items={favourites}
+              onAddToFavourite={onAddToFavourite}
+            />
+          }
+        />
+      </Routes>
     </div>
   );
 }
