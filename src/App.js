@@ -12,29 +12,44 @@ function App() {
   const [favourites, setFavourites] = React.useState([]);
   const [searchValue, setSearchValue] = React.useState('');
   const [cartOpened, setCartOpened] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    axios
-      .get('https://6512b96bb8c6ce52b3961711.mockapi.io/items')
-      .then((res) => {
-        setItems(res.data);
-      });
-    axios
-      .get('https://6512b96bb8c6ce52b3961711.mockapi.io/cart')
-      .then((res) => {
-        setCartItems(res.data);
-      });
-    axios
-      .get('https://65198207818c4e98ac6073b8.mockapi.io/favourites')
-      .then((res) => {
-        setFavourites(res.data);
-      });
+    async function fetchData() {
+      const cartResponse = await axios.get(
+        'https://6512b96bb8c6ce52b3961711.mockapi.io/cart'
+      );
+      const favouritesResponse = await axios.get(
+        'https://65198207818c4e98ac6073b8.mockapi.io/favourites'
+      );
+      const itemsResponse = await axios.get(
+        'https://6512b96bb8c6ce52b3961711.mockapi.io/items'
+      );
+
+      setIsLoading(false);
+
+      setCartItems(cartResponse.data);
+      setFavourites(favouritesResponse.data);
+      setItems(itemsResponse.data);
+    }
+
+    fetchData();
   }, []);
 
   const onAddToCart = (obj) => {
-    axios
-      .post('https://6512b96bb8c6ce52b3961711.mockapi.io/cart', obj)
-      .then((res) => setCartItems((prev) => [...prev, res.data]));
+    console.log(obj);
+
+    if (cartItems.find((item) => Number(item.id) === Number(obj.id))) {
+      axios.delete(
+        `https://6512b96bb8c6ce52b3961711.mockapi.io/cart/${obj.id}`
+      );
+      setCartItems((prev) =>
+        prev.filter((item) => Number(item.id) !== Number(obj.id))
+      );
+    } else {
+      axios.post('https://6512b96bb8c6ce52b3961711.mockapi.io/cart', obj);
+      setCartItems((prev) => [...prev, obj]);
+    }
   };
 
   const onRemoveItem = (id) => {
@@ -81,11 +96,13 @@ function App() {
           element={
             <Home
               items={items}
+              cartItems={cartItems}
               searchValue={searchValue}
               setSearchValue={setSearchValue}
               onChangeSearchInput={onChangeSearchInput}
               onAddToFavourite={onAddToFavourite}
               onAddToCart={onAddToCart}
+              isLoading={isLoading}
             />
           }
         />
