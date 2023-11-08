@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/watch-store/static/css/main.9ed9e76d.css",
+    "main.js": "/watch-store/static/js/main.63209e55.js",
+    "index.html": "/watch-store/index.html",
+    "main.9ed9e76d.css.map": "/watch-store/static/css/main.9ed9e76d.css.map",
+    "main.63209e55.js.map": "/watch-store/static/js/main.63209e55.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9ed9e76d.css",
+    "static/js/main.63209e55.js"
+  ]
+}
